@@ -28,3 +28,6 @@ export { NFDSearch } from './NFDSearch';
 export { TransactionSearch } from './TransactionSearch';
 export { PollSearch } from './PollSearch';
 export { TradeSearch } from './TradeSearch';
+
+// Visualizer wrapper (@akita/visual-explorer)
+export { TransactionsGraph, type TransactionsGraphProps } from './TransactionsGraph';
