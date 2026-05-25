@@ -1,5 +1,6 @@
 import { useMemo } from 'react'
 import { AlgorandClient } from '@algorandfoundation/algokit-utils'
+import { AlgodClient } from '@algorandfoundation/algokit-utils/algod-client'
 import algosdk, { makeEmptyTransactionSigner } from 'algosdk'
 import { useAlgomd } from '../provider/context'
 import { NETWORK_DEFAULTS } from '../provider/networks'
@@ -21,7 +22,12 @@ export function useAlgorandClient(): AlgorandClient {
     const token = config.algodToken ?? defaults.algodToken ?? ''
 
     const client = AlgorandClient.fromClients({
-      algod: new algosdk.Algodv2(token, server, port, config.headers),
+      algod: new AlgodClient({
+        baseUrl: server,
+        port,
+        token,
+        headers: config.headers,
+      }),
     })
 
     // Register an empty signer as default so SDK read methods that use
