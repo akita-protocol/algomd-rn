@@ -102,6 +102,8 @@ export interface NFTListing {
   createdAt: Date;
   listedAt: Date;
   expiresAt?: Date;
+  /** Address of buyer (set locally after purchase, app is deleted on-chain) */
+  buyer?: string;
 }
 
 export interface RaffleListing {
@@ -118,6 +120,8 @@ export interface RaffleListing {
   gating?: GatingInfo;
   creator: string;
   status: 'upcoming' | 'active' | 'ended' | 'claimed';
+  /** Address of the raffle winner */
+  winner?: string;
 }
 
 export interface AuctionListing {
@@ -136,6 +140,8 @@ export interface AuctionListing {
   timeExtended: boolean;
   creator: string;
   status: 'upcoming' | 'active' | 'ended' | 'claimed';
+  /** Address of the highest bidder (winner when ended/claimed) */
+  winner?: string;
 }
 
 export interface TradeOffer {

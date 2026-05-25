@@ -31,12 +31,10 @@ export {
   TransactionSearch,
   PollSearch,
   TradeSearch,
-  // Visualizer wrapper (thin shell over @akita/visual-explorer)
   TransactionsGraph,
 } from './components';
 export type { TransactionsGraphProps } from './components';
 
-// Adapters (react-query-backed resolver for @akita/visual-explorer)
 export {
   createAlgomdDataProvider,
   type CreateAlgomdDataProviderOptions,

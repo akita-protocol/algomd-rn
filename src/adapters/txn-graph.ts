@@ -1,5 +1,5 @@
 /**
- * React-query-backed `DataProviderApi` for `@akita/visual-explorer`.
+ * React-query-backed `DataProviderApi` for `@akta/txn-graph-rn`.
  *
  * Keys cache entries the same way algomd-rn's own hooks do
  * (`['algomd', <kind>, <id>]`) so resolution for the graph and
@@ -19,7 +19,7 @@ import type {
   ApplicationSummary,
   AssetSummary,
   DataProviderApi,
-} from '@akita/visual-explorer'
+} from '@akta/txn-graph-rn'
 import type { ASA as ASAType } from '../types/algorand'
 
 export type CreateAlgomdDataProviderOptions = {
@@ -52,7 +52,7 @@ async function fetchASAForGraph(
     }
   }
   try {
-    const info = await algorand.client.algod.getAssetByID(BigInt(assetId)).do()
+    const info = await algorand.client.algod.assetById(BigInt(assetId))
     const p = info.params
     return {
       id: Number(assetId),

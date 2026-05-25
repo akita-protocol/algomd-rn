@@ -10,6 +10,8 @@ export interface AlgomdConfig {
   /** Override indexer server URL (needed for Transaction) */
   indexerServer?: string
   indexerToken?: string
+  /** Extra HTTP headers to send to algod/indexer */
+  headers?: Record<string, string>
   /** Override NFD API URL (default: https://api.nf.domains) */
   nfdApiUrl?: string
   /** Override image URL resolver (default: Akita CDN proxy) */

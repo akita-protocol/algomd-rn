@@ -20,17 +20,17 @@ export function useAlgorandClient(): AlgorandClient {
     const port = config.algodPort ?? defaults.algodPort
     const token = config.algodToken ?? defaults.algodToken ?? ''
 
-    const client = AlgorandClient.fromConfig({
-      algodConfig: { server, port, token },
+    const client = AlgorandClient.fromClients({
+      algod: new algosdk.Algodv2(token, server, port, config.headers),
     })
 
     // Register an empty signer as default so SDK read methods that use
     // client.send (like RaffleSDK.state → getState ABI call) can simulate
     // without a real signer. This is safe — algomd-rn is a display library.
-    client.setDefaultSigner(makeEmptyTransactionSigner())
+    client.setDefaultSigner(makeEmptyTransactionSigner() as never)
 
     return client
-  }, [config.network, config.algodServer, config.algodPort, config.algodToken])
+  }, [config.network, config.algodServer, config.algodPort, config.algodToken, config.headers])
 }
 
 /**
@@ -45,6 +45,6 @@ export function useIndexerClient(): algosdk.Indexer | null {
     const server = config.indexerServer ?? defaults.indexerServer
     if (!server) return null
     const token = config.indexerToken ?? defaults.indexerToken ?? ''
-    return new algosdk.Indexer(token, server, '')
-  }, [config.network, config.indexerServer, config.indexerToken])
+    return new algosdk.Indexer(token, server, '', config.headers)
+  }, [config.network, config.indexerServer, config.indexerToken, config.headers])
 }

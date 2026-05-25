@@ -11,7 +11,7 @@ export function formatAddress(address: string, chars = 5): string {
  */
 export function formatNumber(num: number, decimals = 2): string {
   return new Intl.NumberFormat('en-US', {
-    minimumFractionDigits: decimals,
+    minimumFractionDigits: 0,
     maximumFractionDigits: decimals,
   }).format(num);
 }

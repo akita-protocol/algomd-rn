@@ -29,5 +29,5 @@ export { TransactionSearch } from './TransactionSearch';
 export { PollSearch } from './PollSearch';
 export { TradeSearch } from './TradeSearch';
 
-// Visualizer wrapper (@akita/visual-explorer)
+// Visualizer wrapper (@akta/txn-graph-rn)
 export { TransactionsGraph, type TransactionsGraphProps } from './TransactionsGraph';

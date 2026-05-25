@@ -1,4 +1,4 @@
 export {
   createAlgomdDataProvider,
   type CreateAlgomdDataProviderOptions,
-} from './visual-explorer'
+} from './txn-graph'

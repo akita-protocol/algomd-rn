@@ -1,5 +1,5 @@
 /**
- * algomd-rn wrapper over `@akita/visual-explorer`'s `<TransactionsGraph>`.
+ * algomd-rn wrapper over `@akta/txn-graph-rn`'s `<TransactionsGraph>`.
  *
  * The library is transport- and resolver-agnostic. This wrapper pre-wires
  * a `DataProvider` so consumers don't have to plumb one themselves — in
@@ -22,7 +22,7 @@ import {
   DataProvider,
   type DataProviderApi,
   type GraphProps,
-} from '@akita/visual-explorer'
+} from '@akta/txn-graph-rn'
 
 export type TransactionsGraphProps = GraphProps & {
   /**

@@ -10,6 +10,7 @@ declare const TextDecoder: { new (): { decode(input?: ArrayBuffer | Uint8Array):
 declare function btoa(data: string): string
 
 import { useQuery } from '@tanstack/react-query'
+import { PollSDK, RaffleSDK, AuctionSDK, MarketplaceSDK, HyperSwapSDK } from '@akta/sdk'
 import { useAlgorandClient, useIndexerClient } from './useAlgorandClient'
 import { useAlgomd } from '../provider/context'
 import { resolveAssetUrl } from '../utils/arc19'
@@ -55,7 +56,7 @@ async function fetchASADetails(algorand: AlgorandClient, assetId: number | bigin
   }
 
   try {
-    const info = await algorand.client.algod.getAssetByID(BigInt(assetId)).do()
+    const info = await algorand.client.algod.assetById(BigInt(assetId))
     const params = info.params
     return {
       id: Number(assetId),
@@ -113,7 +114,7 @@ export function useAccountData(address: string | undefined) {
     queryKey: ['algomd', 'account', address],
     queryFn: async (): Promise<AlgorandAccount> => {
       if (!address) throw new Error('No address provided')
-      const info = await algorand.client.algod.accountInformation(address).do()
+      const info = await algorand.client.algod.accountInformation(address)
       const assets: ASAType[] = (info.assets ?? []).map(
         (a: { assetId: bigint; amount: bigint }) => ({
           id: Number(a.assetId),
@@ -265,7 +266,7 @@ export function usePollData(appId: number | undefined) {
     queryKey: ['algomd', 'poll', appId],
     queryFn: async (): Promise<PollType> => {
       if (!appId) throw new Error('No poll app ID provided')
-      const { PollSDK } = await import('@akta/sdk')
+
       const sdk = new PollSDK({
         algorand,
         factoryParams: { appId: BigInt(appId) },
@@ -317,47 +318,24 @@ export function useRaffleData(appId: number | undefined) {
     queryFn: async (): Promise<RaffleListingType> => {
       if (!appId) throw new Error('No raffle app ID provided')
 
-      // Read global state directly from algod instead of RaffleSDK.state().
-      // RaffleSDK.state() uses client.send.getState() which sends a real
-      // ABI transaction, failing with makeEmptyTransactionSigner().
-      // Direct algod read is free and doesn't require a signer.
-      const appInfo = await algorand.client.algod.getApplicationByID(BigInt(appId)).do()
-      const gs = new Map<string, bigint | Uint8Array>()
-      for (const kv of (appInfo as any).params?.globalState ?? []) {
-        const key = new TextDecoder().decode(kv.key)
-        if (kv.value.type === 2) {
-          gs.set(key, BigInt(kv.value.uint ?? 0))
-        } else {
-          gs.set(key, kv.value.bytes ?? new Uint8Array())
-        }
-      }
 
-      const prizeId = Number(gs.get('prize') as bigint ?? 0n)
-      const ticketAssetId = Number(gs.get('ticketAsset') as bigint ?? 0n)
-      const startTs = Number(gs.get('startTimestamp') as bigint ?? 0n)
-      const endTs = Number(gs.get('endTimestamp') as bigint ?? 0n)
-      const entryCount = Number(gs.get('entryCount') as bigint ?? 0n)
-      const maxTickets = Number(gs.get('maxTickets') as bigint ?? 0n)
-
-      // Seller is stored as 32-byte address bytes in global state
-      let seller = ''
-      const sellerBytes = gs.get('seller')
-      if (sellerBytes instanceof Uint8Array && sellerBytes.length === 32) {
-        try {
-          const { encodeAddress } = await import('algosdk')
-          seller = encodeAddress(sellerBytes)
-        } catch { /* ignore encoding errors */ }
-      }
+      const sdk = new RaffleSDK({
+        algorand,
+        factoryParams: { appId: BigInt(appId), defaultSender: DEFAULT_READER },
+      })
+      const state = await sdk.state()
 
       const [prizeAsset, entryAsset] = await Promise.all([
-        fetchASADetails(algorand, prizeId),
-        fetchASADetails(algorand, ticketAssetId),
+        fetchASADetails(algorand, Number(state.prize)),
+        fetchASADetails(algorand, Number(state.ticketAsset)),
       ])
 
       // Resolve image URLs for assets
       resolveAssetImage(prizeAsset, resolveImageUrl)
       resolveAssetImage(entryAsset, resolveImageUrl)
 
+      const startTs = Number(state.startTimestamp)
+      const endTs = Number(state.endTimestamp)
       const now = Date.now() / 1000
       let status: RaffleListingType['status']
       if (startTs > now) status = 'upcoming'
@@ -368,6 +346,11 @@ export function useRaffleData(appId: number | undefined) {
       const entryDecimals = entryAsset.decimals || 0
       const pricePerEntry = 1 / Math.pow(10, entryDecimals)
 
+      // Winner is set when raffle is drawn — zero address means no winner yet
+      const winner = state.winner && state.winner !== 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAY5HFKQ'
+        ? state.winner
+        : undefined
+
       return {
         id: appId.toString(),
         title: `Raffle #${appId}`,
@@ -377,10 +360,11 @@ export function useRaffleData(appId: number | undefined) {
         startTime: new Date(startTs * 1000),
         endTime: new Date(endTs * 1000),
         prizes: [prizeAsset],
-        entryCount,
-        ticketCount: maxTickets,
-        creator: seller,
+        entryCount: Number(state.entryCount),
+        ticketCount: Number(state.maxTickets),
+        creator: state.seller ?? '',
         status,
+        winner,
       }
     },
     enabled: appId != null,
@@ -395,12 +379,15 @@ export function useAuctionData(appId: number | undefined) {
     queryKey: ['algomd', 'auction', appId],
     queryFn: async (): Promise<AuctionListingType> => {
       if (!appId) throw new Error('No auction app ID provided')
-      const { AuctionSDK } = await import('@akta/sdk')
+
       const sdk = new AuctionSDK({
         algorand,
         factoryParams: { appId: BigInt(appId), defaultSender: DEFAULT_READER },
       })
-      const state = await sdk.state()
+      const [state, minimumBidAmount] = await Promise.all([
+        sdk.state(),
+        sdk.getMinimumBidAmount(),
+      ])
 
       const [prizeAsset, bidAsset] = await Promise.all([
         fetchASADetails(algorand, Number(state.prize)),
@@ -421,6 +408,16 @@ export function useAuctionData(appId: number | undefined) {
 
       const bidDecimals = bidAsset.decimals || 0
       const divisor = Math.pow(10, bidDecimals)
+      const bidCount = Math.max(0, Number(state.bidID) - 1)
+
+      // Resolve winner address for ended/claimed auctions with bids
+      let winner: string | undefined
+      if (status !== 'active' && status !== 'upcoming' && bidCount > 0) {
+        try {
+          const winningBid = await sdk.getBid({ bidId: BigInt(Number(state.bidID) - 1) })
+          winner = winningBid.account?.toString()
+        } catch { /* box may not be readable */ }
+      }
 
       return {
         id: appId.toString(),
@@ -428,16 +425,17 @@ export function useAuctionData(appId: number | undefined) {
         description: `Bid on ${prizeAsset.name} with ${bidAsset.unitName || 'tokens'}.`,
         bidAsset,
         currentHighestBid: Number(state.highestBid) / divisor,
-        minimumNextBid: (Number(state.highestBid) + Number(state.bidMinimumIncrease)) / divisor,
+        minimumNextBid: Number(minimumBidAmount) / divisor,
         startTime: new Date(startTs * 1000),
         endTime: new Date(endTs * 1000),
         prizes: [prizeAsset],
         bidFeePercentage: Number(state.bidFee) > 0 ? Number(state.bidFee) / 100 : undefined,
         currentBidFeePool: 0,
-        bidCount: Number(state.bidID),
+        bidCount,
         timeExtended: false,
         creator: state.seller ?? '',
         status,
+        winner,
       }
     },
     enabled: appId != null,
@@ -452,7 +450,7 @@ export function useNFTListingData(appId: number | undefined) {
     queryKey: ['algomd', 'nftlisting', appId],
     queryFn: async (): Promise<NFTListingType> => {
       if (!appId) throw new Error('No NFT listing app ID provided')
-      const { MarketplaceSDK } = await import('@akta/sdk')
+
       const marketplace = new MarketplaceSDK({
         algorand,
         factoryParams: { defaultSender: DEFAULT_READER },
@@ -499,7 +497,7 @@ export function useTradeOfferData(appId: number | undefined, offerId: number | u
     queryKey: ['algomd', 'trade', appId, offerId],
     queryFn: async (): Promise<TradeOfferType> => {
       if (appId == null || offerId == null) throw new Error('No trade offer ID provided')
-      const { HyperSwapSDK } = await import('@akta/sdk')
+
       const sdk = new HyperSwapSDK({
         algorand,
         factoryParams: { appId: BigInt(appId), defaultSender: DEFAULT_READER },
