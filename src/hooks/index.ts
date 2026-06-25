@@ -1,7 +1,8 @@
-export { useAlgorandClient, useIndexerClient } from './useAlgorandClient'
+export { useAlgorandClient, useIndexerClient } from "./useAlgorandClient";
 export {
   useAccountData,
   useASAData,
+  useCollectionData,
   useTransactionData,
   useNFDProfileData,
   usePollData,
@@ -9,4 +10,4 @@ export {
   useAuctionData,
   useNFTListingData,
   useTradeOfferData,
-} from './useAlgomdData'
+} from "./useAlgomdData";

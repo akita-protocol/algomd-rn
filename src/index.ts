@@ -1,11 +1,17 @@
 // Provider
-export { AlgomdProvider, useAlgomd, defaultResolveImageUrl, NETWORK_DEFAULTS } from './provider';
-export type { AlgomdConfig, AlgomdNetwork } from './provider';
+export {
+  AlgomdProvider,
+  useAlgomd,
+  defaultResolveImageUrl,
+  NETWORK_DEFAULTS,
+} from "./provider";
+export type { AlgomdConfig, AlgomdNetwork } from "./provider";
 
 // Self-fetching Components
 export {
   Account,
   ASA,
+  Collection,
   NFTListing,
   NFDProfile,
   TransactionDetails,
@@ -13,9 +19,11 @@ export {
   RaffleListing,
   AuctionListing,
   TradeOffer,
+  DualStakePool,
   // Display-only (no self-fetch)
   AccountDisplay,
   ASADisplay,
+  CollectionDisplay,
   NFTListingDisplay,
   NFDProfileDisplay,
   TransactionDetailsDisplay,
@@ -23,6 +31,7 @@ export {
   RaffleListingDisplay,
   AuctionListingDisplay,
   TradeOfferDisplay,
+  DualStakePoolDisplay,
   // Search
   AccountSearch,
   ASASearch,
@@ -32,13 +41,13 @@ export {
   PollSearch,
   TradeSearch,
   TransactionsGraph,
-} from './components';
-export type { TransactionsGraphProps } from './components';
+} from "./components";
+export type { TransactionsGraphProps, DualStakePoolProps } from "./components";
 
 export {
   createAlgomdDataProvider,
   type CreateAlgomdDataProviderOptions,
-} from './adapters';
+} from "./adapters";
 
 // Hooks
 export {
@@ -46,6 +55,7 @@ export {
   useIndexerClient,
   useAccountData,
   useASAData,
+  useCollectionData,
   useTransactionData,
   useNFDProfileData,
   usePollData,
@@ -53,22 +63,32 @@ export {
   useAuctionData,
   useNFTListingData,
   useTradeOfferData,
-} from './hooks';
+} from "./hooks";
 
 // Shared UI
-export { SizeContainer, CopyButton, StatusBadge, ProgressBar, SearchSheet } from './ui';
-export { LoadingSkeleton, ErrorState } from './ui/DataStates';
+export {
+  SizeContainer,
+  CopyButton,
+  StatusBadge,
+  ProgressBar,
+  SearchSheet,
+} from "./ui";
+export { LoadingSkeleton, ErrorState } from "./ui/DataStates";
 
 // Types
 export type {
   AlgorandAccount,
   ASA as ASAType,
+  Collection as CollectionType,
   NFTListing as NFTListingType,
   NFDProfile as NFDProfileType,
   TransactionDetails as TransactionDetailsType,
   RaffleListing as RaffleListingType,
   AuctionListing as AuctionListingType,
   TradeOffer as TradeOfferType,
+  DualStakePool as DualStakePoolType,
+  DualStakeAction,
+  DualStakeActionParams,
   Poll as PollType,
   PollOption,
   GatingInfo,
@@ -76,7 +96,7 @@ export type {
   ComponentSize,
   SearchResult,
   SearchableEntity,
-} from './types';
+} from "./types";
 
 // Utilities
 export {
@@ -89,4 +109,4 @@ export {
   searchEntities,
   resolveArc19Url,
   resolveAssetUrl,
-} from './utils';
+} from "./utils";

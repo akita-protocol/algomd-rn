@@ -15,7 +15,7 @@
     "access": "public"
   },
   "peerDependencies": {
-    "@akta/sdk": ">=1.3.31",
+    "@akta/sdk": ">=1.4.4",
     "@akta/txn-graph-rn": ">=0.1.0",
     "@algorandfoundation/algokit-utils": ">=10.0.0-beta.1",
     "@gorhom/bottom-sheet": ">=5.0.0",
@@ -52,7 +52,7 @@
     }
   },
   "devDependencies": {
-    "@akta/sdk": "1.3.31",
+    "@akta/sdk": "1.4.4",
     "@akta/txn-graph-rn": "link:../txn-graph/packages/rn",
     "@algorandfoundation/algokit-utils": "10.0.0-beta.1",
     "@tanstack/react-query": "^5.96.2",

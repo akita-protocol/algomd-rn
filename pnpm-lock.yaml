@@ -49,8 +49,8 @@ importers:
         version: 15.15.3(react-native@0.84.0(@babel/core@7.29.0)(@types/react@19.2.14)(react@19.2.4))(react@19.2.4)
     devDependencies:
       '@akta/sdk':
-        specifier: 1.3.31
-        version: 1.3.31(@algorandfoundation/algokit-utils@10.0.0-beta.1)(algosdk@3.5.2)
+        specifier: 1.4.4
+        version: 1.4.4(@algorandfoundation/algokit-utils@10.0.0-beta.1)(algosdk@3.5.2)
       '@akta/txn-graph-rn':
         specifier: link:../txn-graph/packages/rn
         version: link:../txn-graph/packages/rn
@@ -80,8 +80,8 @@ packages:
       graphql:
         optional: true
 
-  '@akta/sdk@1.3.31':
-    resolution: {integrity: sha512-CJvSudMAJxpymwiG/NidhjcjpPFNcOPWQuC8iOcPwABwHx8XCpVN2HsnJUDTdRIDhEPD4VgE9D2f9zG+6GgpHA==}
+  '@akta/sdk@1.4.4':
+    resolution: {integrity: sha512-FPyft/ewN+jspHq8YgyNXVmlw8ghV58X8eyxB6+QdItX0TzGI3xylADJq2C7bxPvtRWzvnr/HJU+M2FHiVaI2w==}
     peerDependencies:
       '@algorandfoundation/algokit-utils': 10.0.0-beta.1
       algosdk: 3.5.2
@@ -3105,7 +3105,7 @@ snapshots:
 
   '@0no-co/graphql.web@1.2.0': {}
 
-  '@akta/sdk@1.3.31(@algorandfoundation/algokit-utils@10.0.0-beta.1)(algosdk@3.5.2)':
+  '@akta/sdk@1.4.4(@algorandfoundation/algokit-utils@10.0.0-beta.1)(algosdk@3.5.2)':
     dependencies:
       '@algorandfoundation/algokit-utils': 10.0.0-beta.1
       '@noble/hashes': 1.8.0

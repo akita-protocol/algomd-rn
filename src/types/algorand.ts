@@ -42,6 +42,52 @@ export interface ASA {
   verified: boolean;
 }
 
+export type DualStakeAction = "stake" | "exchange";
+
+export interface DualStakeActionParams {
+  action: DualStakeAction;
+  /** ARC58 wallet app ID used by the DualStakePlugin. */
+  wallet: bigint | number;
+  /** Dual stake app / pool ID. */
+  appId: bigint | number;
+  /** Base ALGO amount, in microAlgos. */
+  amount: bigint;
+  /** Whether the plugin should rekey the spending account back to the wallet. */
+  rekeyBack: boolean;
+}
+
+export interface DualStakePool {
+  id: string;
+  appId: number;
+  title?: string;
+  description?: string;
+  status?: "draft" | "upcoming" | "active" | "ended" | "unknown";
+  stakeAsset: ASA;
+  rewardAsset?: ASA;
+  dualStakeAsset?: ASA;
+  rewardRate?: number;
+  rewardRatePrecision?: number;
+  totalStaked?: number;
+  userStaked?: number;
+  startsAt?: Date;
+  endsAt?: Date;
+}
+
+export interface Collection {
+  id: string;
+  name: string;
+  description?: string;
+  avatar?: string | number;
+  avatarUrl?: string;
+  avatarMime?: string;
+  banner?: string | number;
+  network?: string;
+  explicit?: boolean;
+  prefixes?: string[];
+  artists?: string[];
+  nfdId?: number;
+}
+
 export interface Application {
   id: number;
   creator: string;
@@ -61,12 +107,12 @@ export interface Application {
 export interface TransactionDetails {
   id: string;
   type:
-    | 'payment'
-    | 'asset-transfer'
-    | 'application-call'
-    | 'asset-config'
-    | 'key-registration'
-    | 'asset-freeze';
+    | "payment"
+    | "asset-transfer"
+    | "application-call"
+    | "asset-config"
+    | "key-registration"
+    | "asset-freeze";
   from: string;
   to?: string;
   amount?: number;
@@ -79,7 +125,12 @@ export interface TransactionDetails {
   confirmed: boolean;
   signature: string;
   context?: {
-    type: 'nft-purchase' | 'auction-won' | 'raffle-entry' | 'trade-offer' | 'vote';
+    type:
+      | "nft-purchase"
+      | "auction-won"
+      | "raffle-entry"
+      | "trade-offer"
+      | "vote";
     metadata: Record<string, unknown>;
   };
 }
@@ -119,7 +170,7 @@ export interface RaffleListing {
   ticketCount: number;
   gating?: GatingInfo;
   creator: string;
-  status: 'upcoming' | 'active' | 'ended' | 'claimed';
+  status: "upcoming" | "active" | "ended" | "claimed";
   /** Address of the raffle winner */
   winner?: string;
 }
@@ -139,7 +190,7 @@ export interface AuctionListing {
   bidCount: number;
   timeExtended: boolean;
   creator: string;
-  status: 'upcoming' | 'active' | 'ended' | 'claimed';
+  status: "upcoming" | "active" | "ended" | "claimed";
   /** Address of the highest bidder (winner when ended/claimed) */
   winner?: string;
 }
@@ -152,7 +203,7 @@ export interface TradeOffer {
   requesting: (ASA | AlgorandAccount)[];
   message?: string;
   expiresAt: Date;
-  status: 'pending' | 'accepted' | 'rejected' | 'expired';
+  status: "pending" | "accepted" | "rejected" | "expired";
   createdAt: Date;
 }
 
@@ -164,7 +215,7 @@ export interface Poll {
   createdAt: Date;
   expiresAt?: Date;
   totalVotes: number;
-  status: 'active' | 'ended';
+  status: "active" | "ended";
   gating?: GatingInfo;
 }
 
@@ -178,7 +229,13 @@ export interface PollOption {
 }
 
 export interface GatingInfo {
-  type: 'asset-holding' | 'nfd-verified' | 'application-optin' | 'custom' | 'token' | 'nft';
+  type:
+    | "asset-holding"
+    | "nfd-verified"
+    | "application-optin"
+    | "custom"
+    | "token"
+    | "nft";
   requirements: {
     assets?: { assetId: number; minimumBalance: number }[];
     nfdVerified?: boolean;
@@ -201,6 +258,7 @@ export type SearchableEntity =
   | AlgorandAccount
   | NFDProfile
   | ASA
+  | Collection
   | Application
   | TransactionDetails
   | NFTListing
@@ -210,4 +268,4 @@ export type SearchableEntity =
   | Poll;
 
 // Component shared prop types
-export type ComponentSize = 'sm' | 'md' | 'lg' | 'full' | 'fullscreen';
+export type ComponentSize = "sm" | "md" | "lg" | "full" | "fullscreen";
